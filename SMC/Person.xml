@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="GBK"?>
+
+<msg TYPE="00">
+    <database.StaffData>
+        <id>20150908001</id>
+        <staffName>guotonglu</staffName>
+        <password>901210</password>
+        <authority>5</authority>
+        <staffIDNo>430224199101160000</staffIDNo>
+        <staffAge>24</staffAge>
+        <staffGender>F</staffGender>
+        <staffPosition>kfgz</staffPosition>
+        <staffDepartment>kf</staffDepartment>
+        <staffTel>13146094606</staffTel>
+        <staffSalary>4000</staffSalary>
+        <staffHireDate>1970-01-01</staffHireDate>
+        <staffDimissionDate>null</staffDimissionDate>
+    </database.StaffData>
+</msg>
