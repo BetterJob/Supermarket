@@ -23,7 +23,7 @@ public class SupermarketServerControl {
 		}
 		System.out.print("done test!");*/
 		Database db=new Database("./config/dbProperties.ini");
-		//test
+		
 		System.out.println("服务器开始");
 		NSocketServer nss = new NSocketServer();
 		nss.init(db.getConnection());
