@@ -19,7 +19,9 @@ import tools.Tools;
 public class NSocketServer implements Runnable {
 	private Selector selector = null;
 	private ServerSocketChannel server = null;
-	Charset charset = Charset.forName("UTF-8");
+	//Charset charset = Charset.forName("UTF-8");
+	private XMLManage socketResult = null; 
+	private int testCnt = 0;
 	public void init(Connection conn) throws IOException{
 		selector = Selector.open();
 		//通过open方法来打开一个未绑定的ServerSocketChannel实例
@@ -38,6 +40,7 @@ public class NSocketServer implements Runnable {
     public void writeXmltoSocketChannel(SocketChannel sc , Document doc) {
     	try {
 			sc.write(Tools.charset.encode(doc.asXML()));
+			sc.write(Tools.charset.encode(Tools.endingFlag));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -69,17 +72,24 @@ public class NSocketServer implements Runnable {
 						SocketChannel sc = (SocketChannel) sk.channel();
 /**************************************处理数据****************************************/
 						ByteBuffer buff = ByteBuffer.allocate(1024);
+						//sc.
+						
 						String content = "";
 						//开始读取数据
 						try{
 							while(sc.read(buff)>0){//确保消息完整性,每次读完所有数据
 								buff.flip();
-								content += charset.decode(buff);
+								content += Tools.charset.decode(buff);
 							}
-							System.out.println("========"+content);
-							//解析content
-							XMLManage xm = new XMLManage(content);
-							xm.writeXmltoOutputStream(new FileOutputStream(new File("D:\\xml.xml")));
+							System.out.println("====第"+(++testCnt)+"次接收===="+content);
+							sc.write(Tools.charset.encode(("server send "+testCnt+"\r\n")));
+							/*if(!content.equals("")){
+								content = removeEndingFlag(content);
+								System.out.println("remove ending~~~"+content);
+								//解析content
+								socketResult = new XMLManage(content);
+								socketResult.writeXmltoOutputStream(new FileOutputStream(new File("D:\\xml.xml")));
+							}*/
 							sk.interestOps(SelectionKey.OP_READ);
 						}
 						catch (IOException e){
@@ -96,5 +106,11 @@ public class NSocketServer implements Runnable {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public XMLManage getResult(){
+		return socketResult;
+	}
+	public String removeEndingFlag(String str){
+		return str.substring(0, str.indexOf(Tools.endingFlag));
+	}
 }
