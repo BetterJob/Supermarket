@@ -24,7 +24,7 @@ public abstract class DataModel {
 		this.id=id;
 	};
 	
-	public abstract void packDataIntoElement(Element fatherElement);
+	public abstract void packDataIntoElement(Element fatherElement,String dealType);
 	protected abstract void getDatafromElement(Element dataModelElement)throws DatatypeConfigurationException;
 	public abstract void printData();
 }

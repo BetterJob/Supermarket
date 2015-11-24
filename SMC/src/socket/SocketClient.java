@@ -34,13 +34,14 @@ public class SocketClient {
 		new Thread(new ClientThread(s)).start();
 	}
 	
+	//fileEndFlag必须和数据在同一行
 	public void write(String str){
-		ps.println(str+Tools.endingFlag);
+		ps.println(str+Tools.fileEndFlag);
 		//ps.print();
 	}
 	
 	public void write(Document doc){
-		ps.println(doc.asXML()+Tools.endingFlag);
+		ps.println(doc.asXML()+Tools.fileEndFlag);
 		//ps.print();
 	}
 	
@@ -95,6 +96,6 @@ public class SocketClient {
 	}
 	
 	public String removeEndingFlag(String str){
-		return str.substring(0, str.indexOf(Tools.endingFlag));
+		return str.substring(0, str.indexOf(Tools.fileEndFlag));
 	}
 }

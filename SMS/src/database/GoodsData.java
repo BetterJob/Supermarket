@@ -6,6 +6,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.dom4j.Element;
 
+import tools.Tools;
+
 /**
  * Description:商品表数据封装
  * Copyright (C), 2015-2018, Tonglu Guo
@@ -152,21 +154,16 @@ public class GoodsData extends DataModel {
 	 * @param Element fatherElement:要打包到的Element，通过该Element可生成xml文档
 	 */
 	@Override
-	public void packDataIntoElement(Element fatherElement) {
+	public void packDataIntoElement(Element fatherElement,String dealType) {
 		// TODO Auto-generated method stub
 		Element gd = fatherElement.addElement(this.getClass().getSimpleName());
-		gd.addElement(idRN).addText(this.id);
-		gd.addElement(nameRN).addText(this.name);
-		gd.addElement(barCodeRN).addText(this.barCode);
-		gd.addElement(typeRN).addText(this.type);
-		gd.addElement(supplierIDRN).addText(this.supplierID);
-		gd.addElement(priceInRN).addText(this.priceIn+"");
-		gd.addElement(priceOutRN).addText(this.priceOut+"");
-		gd.addElement(validDateRN).addText(this.validDate+"");
-		gd.addElement(categoryRN).addText(this.category);
-		gd.addElement(commentRN).addText(this.comment);
-		gd.addElement(remainAmountRN).addText(this.remainAmount+"");
-		gd.addElement(warnAmountRN).addText(this.warnAmount+"");
+		gd.addAttribute(Tools.dealType, dealType);
+		gd.addAttribute(Tools.content, this.id + Tools.contentDelimiter + this.name + Tools.contentDelimiter
+				+ this.barCode + Tools.contentDelimiter + this.type + Tools.contentDelimiter + this.supplierID 
+				+ Tools.contentDelimiter + this.priceIn + Tools.contentDelimiter + this.priceOut + Tools.contentDelimiter
+				+ this.validDate + Tools.contentDelimiter + this.category + Tools.contentDelimiter + this.comment 
+				+ Tools.contentDelimiter + this.remainAmount + Tools.contentDelimiter + this.warnAmount);
+		
 	}
 	/**
 	 * Description:从Element dataModelElement中提取GoodsData
@@ -177,18 +174,20 @@ public class GoodsData extends DataModel {
 	protected void getDatafromElement(Element dataModelElement) throws DatatypeConfigurationException{
 		// TODO Auto-generated method stub
 		if(dataModelElement.getName().equals(this.getClass().getSimpleName())){
-			this.id=dataModelElement.elementText(idRN);
-			this.name=dataModelElement.elementText(nameRN);
-			this.barCode=dataModelElement.elementText(barCodeRN);
-			this.type=dataModelElement.elementText(typeRN);
-			this.supplierID=dataModelElement.elementText(supplierIDRN);
-			this.priceIn=Double.valueOf(dataModelElement.elementText(priceInRN));
-			this.priceOut=Double.valueOf(dataModelElement.elementText(priceOutRN));
-			this.validDate=Date.valueOf(dataModelElement.elementText(validDateRN));
-			this.category=dataModelElement.elementText(categoryRN);
-			this.comment=dataModelElement.elementText(commentRN);
-			this.remainAmount = Double.valueOf(dataModelElement.elementText(remainAmountRN));
-			this.warnAmount = Double.valueOf(dataModelElement.elementText(warnAmountRN));
+			String content = dataModelElement.attributeValue(Tools.content);
+			String[] temp = content.split(Tools.contentDelimiter);
+			this.id=temp[0];
+			this.name=temp[1];
+			this.barCode=temp[2];
+			this.type=temp[3];
+			this.supplierID=temp[4];
+			this.priceIn=temp[5].equals("null")?null:Double.valueOf(temp[5]);
+			this.priceOut=temp[6].equals("null")?null:Double.valueOf(temp[6]);
+			this.validDate=temp[7].equals("null")?null:Date.valueOf(temp[7]);
+			this.category=temp[8];
+			this.comment=temp[9];
+			this.remainAmount = temp[10].equals("null")?null:Double.valueOf(temp[10]);
+			this.warnAmount = temp[11].equals("null")?null:Double.valueOf(temp[11]);
 		}
 		else {
 			throw new DatatypeConfigurationException("function getDatafromElement in " + this.getClass().getSimpleName() + "is not matched!");

@@ -13,6 +13,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.dom4j.Element;
 
+import tools.Tools;
+
 public class PurchaseData extends DataModel {
 	/*进货单号（CHAR(20) NOT NULL），商品ID（外键商品表CHAR(20) NOT NULL），
 	进价(DOUBLE NOT NULL)，进量(DOUBLE NOT NULL)，进货时间(DATETIME(系统自动获取当前时间))，
@@ -90,15 +92,13 @@ public class PurchaseData extends DataModel {
 	 * @param Element fatherElement:要打包到的Element，通过该Element可生成xml文档
 	 */
 	@Override
-	public void packDataIntoElement(Element fatherElement) {
+	public void packDataIntoElement(Element fatherElement,String dealType) {
 		// TODO Auto-generated method stub
 		Element pd = fatherElement.addElement(this.getClass().getSimpleName());
-		pd.addElement(idRN).addText(this.id);
-		pd.addElement(goodsIDRN).addText(this.goodsID);
-		pd.addElement(priceInRN).addText(this.priceIn+"");
-		pd.addElement(amountRN).addText(this.amount+"");
-		pd.addElement(dateInRN).addText(this.dateIn+"");
-		pd.addElement(operatorRN).addText(this.operator);
+		pd.addAttribute(Tools.dealType, dealType);
+		pd.addAttribute(Tools.content, this.id + Tools.contentDelimiter + this.goodsID + Tools.contentDelimiter
+				+ this.priceIn + Tools.contentDelimiter + this.amount + Tools.contentDelimiter + this.dateIn 
+				+ Tools.contentDelimiter + this.operator);
 	}
 	/**
 	 * Description:从Element dataModelElement中提取PurchaseData
@@ -110,12 +110,14 @@ public class PurchaseData extends DataModel {
 			throws DatatypeConfigurationException {
 		// TODO Auto-generated method stub
 		if(dataModelElement.getName().equals(this.getClass().getSimpleName())){
-			this.id = dataModelElement.elementText(idRN);
-			this.goodsID = dataModelElement.elementText(goodsIDRN);
-			this.priceIn = Double.valueOf(dataModelElement.elementText(priceInRN));
-			this.amount = Double.valueOf(dataModelElement.elementText(amountRN));
-			this.dateIn = Date.valueOf(dataModelElement.elementText(dateInRN));
-			this.operator = dataModelElement.elementText(operatorRN);
+			String content = dataModelElement.attributeValue(Tools.content);
+			String[] temp = content.split(Tools.contentDelimiter);
+			this.id = temp[0];
+			this.goodsID = temp[1];
+			this.priceIn = temp[2].equals("null")?null:Double.valueOf(temp[2]);
+			this.amount = temp[3].equals("null")?null:Double.valueOf(temp[3]);
+			this.dateIn = temp[4].equals("null")?null:Date.valueOf(temp[4]);
+			this.operator = temp[5];
 		}
 		else {
 			throw new DatatypeConfigurationException("function getDatafromElement in " + this.getClass().getSimpleName() + "is not matched!");

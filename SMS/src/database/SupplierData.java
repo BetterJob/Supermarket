@@ -5,6 +5,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.dom4j.Element;
 
+import tools.Tools;
+
 /**
  * Description:供货商表数据封装
  * Copyright (C), 2015-2018, Tonglu Guo
@@ -130,19 +132,14 @@ public class SupplierData extends DataModel {
 	 * @param Element fatherElement:要打包到的Element，通过该Element可生成xml文档
 	 */
 	@Override
-	public void packDataIntoElement(Element fatherElement) {
+	public void packDataIntoElement(Element fatherElement,String dealType) {
 		// TODO Auto-generated method stub
 		Element sd = fatherElement.addElement(this.getClass().getSimpleName());
-		sd.addElement(idRN).addText(this.id);
-		sd.addElement(nameRN).addText(this.name);
-		sd.addElement(linkmanRN).addText(this.linkman);
-		sd.addElement(addrRN).addText(this.addr);
-		sd.addElement(telRN).addText(this.tel);
-		sd.addElement(emailRN).addText(this.email);
-		sd.addElement(bankRN).addText(this.bank);
-		sd.addElement(accountNameRN).addText(this.accountName);
-		sd.addElement(accountNumRN).addText(this.accountNum);
-		sd.addElement(commentRN).addText(this.comment);		
+		sd.addAttribute(Tools.dealType, dealType);
+		sd.addAttribute(Tools.content, this.id + Tools.contentDelimiter + this.name + Tools.contentDelimiter + 
+				this.linkman + Tools.contentDelimiter + this.addr + Tools.contentDelimiter + this.tel + 
+				Tools.contentDelimiter + this.email + Tools.contentDelimiter + this.bank + Tools.contentDelimiter
+				+ this.accountName + Tools.contentDelimiter + this.accountNum + Tools.contentDelimiter + this.comment);	
 	}
 	/**
 	 * Description:从Element dataModelElement中提取SupplierData
@@ -154,16 +151,18 @@ public class SupplierData extends DataModel {
 			throws DatatypeConfigurationException {
 		// TODO Auto-generated method stub
 		if(dataModelElement.getName().equals(this.getClass().getSimpleName())){
-			this.id=dataModelElement.elementText(idRN);
-			this.name=dataModelElement.elementText(nameRN);
-			this.linkman=dataModelElement.elementText(linkmanRN);
-			this.addr=dataModelElement.elementText(addrRN);
-			this.tel=dataModelElement.elementText(telRN);
-			this.email=dataModelElement.elementText(emailRN);
-			this.bank=dataModelElement.elementText(bankRN);
-			this.accountName=dataModelElement.elementText(accountNameRN);
-			this.accountNum=dataModelElement.elementText(accountNumRN);
-			this.comment=dataModelElement.elementText(commentRN);
+			String content = dataModelElement.attributeValue(Tools.content);
+			String[] temp = content.split(Tools.contentDelimiter);
+			this.id=temp[0];
+			this.name=temp[1];
+			this.linkman=temp[2];
+			this.addr=temp[3];
+			this.tel=temp[4];
+			this.email=temp[5];
+			this.bank=temp[6];
+			this.accountName=temp[7];
+			this.accountNum=temp[8];
+			this.comment=temp[9];
 		}
 		else {
 			throw new DatatypeConfigurationException("function getDatafromElement in " + this.getClass().getSimpleName() + "is not matched!");

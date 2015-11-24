@@ -64,7 +64,7 @@ public class PurchaseTable extends TableOperate {
 		Statement st = null;
 		try {
 			st = conn.createStatement();
-			st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
+			if( 0!=st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
 				+ DataModel.idRN +" CHAR(20) NOT NULL,"
 				+ PurchaseData.goodsIDRN +" CHAR(20) NOT NULL,"
 				+ PurchaseData.priceInRN +" DOUBLE NOT NULL,"
@@ -75,9 +75,14 @@ public class PurchaseTable extends TableOperate {
 				+ "FOREIGN KEY(" + PurchaseData.goodsIDRN +")"
 				+ "REFERENCES GoodsTable(" + DataModel.idRN + "),"
 				+ "FOREIGN KEY(" + PurchaseData.operatorRN +")"
-				+ "REFERENCES StaffTable(" + DataModel.idRN + "));");
-			System.out.println("PurchaseTable表建立完成！");
-			return true;
+				+ "REFERENCES StaffTable(" + DataModel.idRN + "));")) {
+				String[] index = new String[1];
+				index[0] = DataModel.idRN;
+				createIndexforTable(conn, "index_" + tableName, index);
+				return true;
+			}
+			//System.out.println("PurchaseTable表建立完成！");
+			//return true;
 			
 		} 
 		catch(SQLException e){

@@ -196,19 +196,26 @@ public final class Database {
 		if(createcpdsToDb()!=null){
 			Connection conn = null;
 			try {
+				
 				conn = cpds.getConnection();
 				staffTable = new StaffTable("StaffTable");
 				staffTable.createTable(conn);
+				//staffTable.createIndexforTable(conn, "index1", index);
 				supplierTable = new SupplierTable("SupplierTable");
 				supplierTable.createTable(conn);
+				//supplierTable.createIndexforTable(conn, "index1", index);
 				goodsTable = new GoodsTable("GoodsTable");
 				goodsTable.createTable(conn);
+				//goodsTable.createIndexforTable(conn, "index1", index);
 				purchaseTable = new PurchaseTable("PurchaseTable");
 				purchaseTable.createTable(conn);
+				//purchaseTable.createIndexforTable(conn, "index1", index);
 				vipTable = new VIPTable("VIPTable");
 				vipTable.createTable(conn);
+				//vipTable.createIndexforTable(conn, "index1", index);
 				salesTable = new SalesTable("SalesTable");
 				salesTable.createTable(conn);
+				//salesTable.createIndexforTable(conn, "index1", index);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -60,7 +60,7 @@ public class StaffTable extends TableOperate {
 		Statement st=null;
 		try {
 			st = conn.createStatement();
-			st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
+			if( 0!=st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
 				+ DataModel.idRN +" CHAR(20) NOT NULL PRIMARY KEY,"
 				+ StaffData.staffNameRN +" CHAR(50) NOT NULL,"
 				+ StaffData.passwordRN +" CHAR(50) NOT NULL,"
@@ -73,9 +73,14 @@ public class StaffTable extends TableOperate {
 				+ StaffData.staffTelRN + " CHAR(30),"
 				+ StaffData.staffSalaryRN + " DOUBLE,"
 				+ StaffData.staffHireDateRN + " DATE,"
-				+ StaffData.staffDimissionDateRN + " DATE DEFAULT NULL);");
-			System.out.println(tableName + "表建立完成！");
-			return true;
+				+ StaffData.staffDimissionDateRN + " DATE DEFAULT NULL);")) {
+				String[] index = new String[1];
+				index[0] = DataModel.idRN;
+				createIndexforTable(conn, "index_" + tableName, index);
+				return true;
+			}
+			//System.out.println(tableName + "表建立完成！");
+			
 		} 
 		catch(SQLException e){
 			e.printStackTrace();

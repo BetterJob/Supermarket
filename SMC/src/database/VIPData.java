@@ -6,6 +6,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.dom4j.Element;
 
+import tools.Tools;
+
 /**
  * Description:会员表数据封装
  * Copyright (C), 2015-2018, Tonglu Guo
@@ -141,20 +143,15 @@ public class VIPData extends DataModel {
 	 * @param Element fatherElement:要打包到的Element，通过该Element可生成xml文档
 	 */
 	@Override
-	public void packDataIntoElement(Element fatherElement) {
+	public void packDataIntoElement(Element fatherElement,String dealType) {
 		// TODO Auto-generated method stub
-		Element sd = fatherElement.addElement(this.getClass().getSimpleName());
-		sd.addElement(idRN).addText(this.id);
-		sd.addElement(nameRN).addText(this.name);
-		sd.addElement(iDNoRN).addText(this.iDNo);
-		sd.addElement(genderRN).addText(this.gender);
-		sd.addElement(telRN).addText(this.tel);
-		sd.addElement(birthdayRN).addText(this.birthday+"");
-		sd.addElement(passwordRN).addText(this.password);
-		sd.addElement(emailRN).addText(this.email);
-		sd.addElement(pointsRN).addText(this.points+"");
-		sd.addElement(totalPointsRN).addText(this.totalPoints+"");
-		sd.addElement(registDateRN).addText(this.registDate+"");
+		Element vd = fatherElement.addElement(this.getClass().getSimpleName());
+		vd.addAttribute(Tools.dealType, dealType);
+		vd.addAttribute(Tools.content, this.id + Tools.contentDelimiter + this.name + Tools.contentDelimiter
+				+ this.iDNo + Tools.contentDelimiter + this.gender + Tools.contentDelimiter + this.tel 
+				+ Tools.contentDelimiter + this.birthday + Tools.contentDelimiter + this.password 
+				+ Tools.contentDelimiter + this.email + Tools.contentDelimiter + this.points 
+				+ Tools.contentDelimiter + this.totalPoints + Tools.contentDelimiter + this.registDate);	
 	}
 	/**
 	 * Description:从Element dataModelElement中提取VIPData
@@ -166,17 +163,19 @@ public class VIPData extends DataModel {
 			throws DatatypeConfigurationException {
 		// TODO Auto-generated method stub
 		if(dataModelElement.getName().equals(this.getClass().getSimpleName())){
-			this.id=dataModelElement.elementText(idRN);
-			this.name=dataModelElement.elementText(nameRN);
-			this.iDNo=dataModelElement.elementText(iDNoRN);
-			this.gender=dataModelElement.elementText(genderRN);
-			this.tel=dataModelElement.elementText(telRN);
-			this.birthday=Date.valueOf(dataModelElement.elementText(birthdayRN));
-			this.password=dataModelElement.elementText(passwordRN);
-			this.email=dataModelElement.elementText(emailRN);
-			this.points=Integer.valueOf(dataModelElement.elementText(pointsRN));
-			this.totalPoints=Integer.valueOf(dataModelElement.elementText(totalPointsRN));
-			this.registDate = Date.valueOf(dataModelElement.elementText(registDateRN));
+			String content = dataModelElement.attributeValue(Tools.content);
+			String[] temp = content.split(Tools.contentDelimiter);
+			this.id=temp[0];
+			this.name=temp[1];
+			this.iDNo=temp[2];
+			this.gender=temp[3];
+			this.tel=temp[4];
+			this.birthday=temp[5].equals(null)?null:Date.valueOf(temp[5]);
+			this.password=temp[6];
+			this.email=temp[7];
+			this.points=temp[8].equals(null)?null:Integer.valueOf(temp[8]);
+			this.totalPoints=temp[9].equals(null)?null:Integer.valueOf(temp[9]);
+			this.registDate = temp[10].equals(null)?null:Date.valueOf(temp[10]);
 		}
 		else {
 			throw new DatatypeConfigurationException("function getDatafromElement in " + this.getClass().getSimpleName() + "is not matched!");

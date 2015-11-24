@@ -6,6 +6,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.dom4j.Element;
 
+import tools.Tools;
+
 /**
  * Description:销售表数据封装
  * Copyright (C), 2015-2018, Tonglu Guo
@@ -100,16 +102,13 @@ public class SalesData extends DataModel {
 	 * @param Element fatherElement:要打包到的Element，通过该Element可生成xml文档
 	 */
 	@Override
-	public void packDataIntoElement(Element fatherElement) {
+	public void packDataIntoElement(Element fatherElement,String dealType) {
 		// TODO Auto-generated method stub
 		Element sd = fatherElement.addElement(this.getClass().getSimpleName());
-		sd.addElement(idRN).addText(this.id);
-		sd.addElement(goodsIDRN).addText(this.goodsID);
-		sd.addElement(priceOutRN).addText(this.priceOut+"");
-		sd.addElement(amountRN).addText(this.amount+"");
-		sd.addElement(dateOutRN).addText(this.dateOut+"");
-		sd.addElement(operaterIDRN).addText(this.operaterID);
-		sd.addElement(clientIDRN).addText(this.clientID);
+		sd.addAttribute(Tools.dealType, dealType);
+		sd.addAttribute(Tools.content, this.id + Tools.contentDelimiter + this.goodsID + Tools.contentDelimiter
+				+ this.priceOut + Tools.contentDelimiter + this.amount + Tools.contentDelimiter	+ this.dateOut 
+				+ Tools.contentDelimiter + this.operaterID + Tools.contentDelimiter + this.clientID);
 	}
 	/**
 	 * Description:从Element dataModelElement中提取SalesData
@@ -121,13 +120,15 @@ public class SalesData extends DataModel {
 			throws DatatypeConfigurationException {
 		// TODO Auto-generated method stub
 		if(dataModelElement.getName().equals(this.getClass().getSimpleName())){
-			this.id = dataModelElement.elementText(idRN);
-			this.goodsID = dataModelElement.elementText(goodsIDRN);
-			this.priceOut = Double.valueOf(dataModelElement.elementText(priceOutRN));
-			this.amount = Double.valueOf(dataModelElement.elementText(amountRN));
-			this.dateOut = Date.valueOf(dataModelElement.elementText(dateOutRN));
-			this.operaterID = dataModelElement.elementText(operaterIDRN);
-			this.clientID = dataModelElement.elementText(clientIDRN);
+			String content = dataModelElement.attributeValue(Tools.content);
+			String[] temp = content.split(Tools.contentDelimiter);
+			this.id = temp[0];
+			this.goodsID = temp[1];
+			this.priceOut = temp[2].equals("null")?null:Double.valueOf(temp[2]);
+			this.amount = temp[3].equals("null")?null:Double.valueOf(temp[3]);
+			this.dateOut = temp[4].equals("null")?null:Date.valueOf(temp[4]);
+			this.operaterID = temp[5];
+			this.clientID = temp[6];
 		}
 		else {
 			throw new DatatypeConfigurationException("function getDatafromElement in " + this.getClass().getSimpleName() + "is not matched!");

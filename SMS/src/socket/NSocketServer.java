@@ -1,6 +1,7 @@
 package socket;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -20,9 +21,9 @@ public class NSocketServer implements Runnable {
 	private Selector selector = null;
 	private ServerSocketChannel server = null;
 	//Charset charset = Charset.forName("UTF-8");
-	private XMLManage socketResult = null; 
 	private int testCnt = 0;
-	public void init(Connection conn) throws IOException{
+	//private String content = "";
+	public void init() throws IOException{
 		selector = Selector.open();
 		//通过open方法来打开一个未绑定的ServerSocketChannel实例
 		server = ServerSocketChannel.open();
@@ -40,7 +41,7 @@ public class NSocketServer implements Runnable {
     public void writeXmltoSocketChannel(SocketChannel sc , Document doc) {
     	try {
 			sc.write(Tools.charset.encode(doc.asXML()));
-			sc.write(Tools.charset.encode(Tools.endingFlag));
+			sc.write(Tools.charset.encode(Tools.fileEndFlag));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -68,29 +69,54 @@ public class NSocketServer implements Runnable {
 						sk.interestOps(SelectionKey.OP_ACCEPT);
 					}
 					else if(sk.isReadable()) {
+						System.out.println("testCnt:"+testCnt++);
 						//获取该SelectionKey对应的Channel，该Channel中有可读取的数据
 						SocketChannel sc = (SocketChannel) sk.channel();
 /**************************************处理数据****************************************/
 						ByteBuffer buff = ByteBuffer.allocate(1024);
 						//sc.
+						String content = "";//局部变量造成读取数据被分成若干段后出问题未解决
 						
-						String content = "";
 						//开始读取数据
 						try{
 							while(sc.read(buff)>0){//确保消息完整性,每次读完所有数据
 								buff.flip();
 								content += Tools.charset.decode(buff);
+								if(content.contains(Tools.fileEndFlag)) {
+									content = content.replaceAll("[\\t\\n\\r]", "");
+									content += " ";
+									String[] temp = content.split(Tools.fileEndFlag);
+									System.out.println("content : "+content);
+									System.out.println("length:"+temp.length);
+									for(int i=0;i<temp.length-1;i++){
+										//新建线程解析接收到的数据
+										System.out.println("temp : "+i+temp[i]);
+										new Thread(new praseData(sc,new XMLManage(temp[i]))).start();
+									}
+									content = temp[temp.length-1].equals(" ")?"":temp[temp.length-1].substring(0, temp[temp.length-1].length()-1);
+									System.out.println("cc:"+content);
+								}
+								/*while(content.contains(Tools.fileEndFlag)){
+									System.out.println("!~~~~~~~~~~~~~~~~~~~~~~~~~~~~!");
+									System.out.println("content: "+content);
+									System.out.println("!############################!");
+									System.out.println("after remove :"+removeEndingFlag(content));
+									//新建线程解析接收到的数据
+									new Thread(new praseData(sc,new XMLManage(removeEndingFlag(content)))).start();
+									//提取剩余内容
+									content = getNextContent(content);
+									System.out.println("!^^^^^^^^^^^^^^^^^^^^^^^^^^^!");
+									System.out.println("next: "+content);
+								}*/
 							}
-							System.out.println("====第"+(++testCnt)+"次接收===="+content);
-							sc.write(Tools.charset.encode(("server send "+testCnt+"\r\n")));
-							/*if(!content.equals("")){
-								content = removeEndingFlag(content);
-								System.out.println("remove ending~~~"+content);
-								//解析content
-								socketResult = new XMLManage(content);
-								socketResult.writeXmltoOutputStream(new FileOutputStream(new File("D:\\xml.xml")));
-							}*/
+							/*System.out.println("====第"+(++testCnt)+"次接收===="+content);
+							sc.write(Tools.charset.encode(("server send "+testCnt+"\r\n")));*/
+							
+							//解析content
+							/*socketResult = new XMLManage(content);
+							socketResult.writeXmltoOutputStream(new FileOutputStream(new File("D:\\xml.xml")));*/
 							sk.interestOps(SelectionKey.OP_READ);
+							buff.clear();
 						}
 						catch (IOException e){
 							sk.cancel();
@@ -106,11 +132,35 @@ public class NSocketServer implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
-	public XMLManage getResult(){
-		return socketResult;
+	private class praseData implements Runnable{
+		SocketChannel sk = null;
+		XMLManage xml = null;
+		public praseData(SocketChannel sk,XMLManage xml){
+			this.sk = sk;
+			this.xml = xml;
+		}
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			/*try {
+				System.out.println("receive data "+ xml.getDocument().asXML());
+				xml.writeXmltoOutputStream(new FileOutputStream(new File("E:\\xml.xml")));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
+		}
+		
 	}
+	/*public XMLManage getResult(){
+		return socketResult;
+	}*/
 	public String removeEndingFlag(String str){
-		return str.substring(0, str.indexOf(Tools.endingFlag));
+		str = str.replaceAll("\r\n", "");
+		return str.substring(0, str.indexOf(Tools.fileEndFlag));
+	}
+	public String getNextContent(String str){
+		str = str.replaceAll("\r\n", "");
+		return str.substring(str.indexOf(Tools.fileEndFlag)+Tools.fileEndFlag.length());
 	}
 }

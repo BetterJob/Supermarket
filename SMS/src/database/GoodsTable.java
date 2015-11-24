@@ -66,7 +66,7 @@ public class GoodsTable extends TableOperate {
 		Statement st = null;
 		try {
 			st = conn.createStatement();
-			st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
+			if( 0!=st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
 				+ DataModel.idRN +" CHAR(20) NOT NULL PRIMARY KEY,"
 				+ GoodsData.nameRN +" CHAR(50) NOT NULL,"
 				+ GoodsData.barCodeRN +" CHAR(50) NOT NULL,"
@@ -80,9 +80,13 @@ public class GoodsTable extends TableOperate {
 				+ GoodsData.remainAmountRN + " DOUBLE NOT NULL,"
 				+ GoodsData.warnAmountRN + " DOUBLE DEFAULT 0.0 CHECK(" + GoodsData.warnAmountRN + ">=0 ),"
 				+ "FOREIGN KEY(" + GoodsData.supplierIDRN +")"
-				+ "REFERENCES SupplierTable(" + DataModel.idRN + "));");
-			System.out.println(tableName + "表建立完成！");
-			return true;
+				+ "REFERENCES SupplierTable(" + DataModel.idRN + "));")) {
+				String[] index = new String[1];
+				index[0] = DataModel.idRN;
+				createIndexforTable(conn, "index_" + tableName, index);
+				return true;
+			}
+			//System.out.println(tableName + "表建立完成！");
 		} 
 		catch(SQLException e){
 			e.printStackTrace();

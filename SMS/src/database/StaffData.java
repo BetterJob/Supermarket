@@ -13,6 +13,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.dom4j.Element;
 
+import tools.Tools;
+
 public class StaffData extends DataModel {
 	/*员工ID（主键+外键CHAR(20) NOT NULL PRIMARY KEY），员工名(CHAR(50))，
 	身份证号(CHAR(50))，员工年龄(INT)，员工性别(CHAR(1))，员工职位(CHAR(50))，
@@ -193,22 +195,16 @@ public class StaffData extends DataModel {
 	 * @param Element fatherElement:要打包到的Element，通过该Element可生成xml文档
 	 */
 	@Override
-	public void packDataIntoElement(Element fatherElement){
+	public void packDataIntoElement(Element fatherElement,String dealType){
 		//Element sd = new Element;
 		Element sd = fatherElement.addElement(this.getClass().getSimpleName());
-		sd.addElement(idRN).addText(this.id);
-		sd.addElement(staffNameRN).addText(this.staffName);
-		sd.addElement(passwordRN).addText(this.password);
-		sd.addElement(authorityRN).addText(this.authority+"");
-		sd.addElement(staffIDNoRN).addText(this.staffIDNo);
-		sd.addElement(staffAgeRN).addText(this.staffAge+"");
-		sd.addElement(staffGenderRN).addText(this.staffGender);
-		sd.addElement(staffPositionRN).addText(this.staffPosition);
-		sd.addElement(staffDepartmentRN).addText(this.staffDepartment);
-		sd.addElement(staffTelRN).addText(this.staffTel);
-		sd.addElement(staffSalaryRN).addText(this.staffSalary+"");
-		sd.addElement(staffHireDateRN).addText(this.staffHireDate+"");
-		sd.addElement(staffDimissionDateRN).addText(this.staffDimissionDate+"");
+		sd.addAttribute(Tools.dealType, dealType);
+		sd.addAttribute(Tools.content, this.id + Tools.contentDelimiter + this.staffName + Tools.contentDelimiter
+				+ this.password + Tools.contentDelimiter + this.authority + Tools.contentDelimiter + this.staffIDNo
+				+ Tools.contentDelimiter + this.staffAge + Tools.contentDelimiter + this.staffGender + Tools.contentDelimiter
+				+ this.staffPosition + Tools.contentDelimiter + this.staffDepartment + Tools.contentDelimiter
+				+ this.staffTel + Tools.contentDelimiter + this.staffSalary + Tools.contentDelimiter
+				+ this.staffHireDate + Tools.contentDelimiter + this.staffDimissionDate);
 	}
 	/**
 	 * Description:从Element dataModelElement中提取StaffData
@@ -220,19 +216,21 @@ public class StaffData extends DataModel {
 			throws DatatypeConfigurationException {
 		// TODO Auto-generated method stub
 		if(dataModelElement.getName().equals(this.getClass().getSimpleName())){
-			this.id=dataModelElement.elementText(idRN);
-			this.staffName=dataModelElement.elementText(staffNameRN);
-			this.password=dataModelElement.elementText(passwordRN);
-			this.authority=Integer.valueOf(dataModelElement.elementText(authorityRN));
-			this.staffIDNo=dataModelElement.elementText(staffIDNoRN);
-			this.staffAge=Integer.valueOf(dataModelElement.elementText(staffAgeRN));
-			this.staffGender=dataModelElement.elementText(staffGenderRN);
-			this.staffPosition=dataModelElement.elementText(staffPositionRN);
-			this.staffDepartment=dataModelElement.elementText(staffDepartmentRN);
-			this.staffTel=dataModelElement.elementText(staffTelRN);
-			this.staffSalary = Double.valueOf(dataModelElement.elementText(staffSalaryRN));
-			this.staffHireDate = Date.valueOf(dataModelElement.elementText(staffHireDateRN));
-			this.staffDimissionDate = Date.valueOf(dataModelElement.elementText(staffDimissionDateRN));
+			String content = dataModelElement.attributeValue(Tools.content);
+			String[] temp = content.split(Tools.contentDelimiter);
+			this.id=temp[0];
+			this.staffName=temp[1];
+			this.password=temp[2];
+			this.authority=temp[11].equals("null")?null:Integer.valueOf(temp[3]);
+			this.staffIDNo=temp[4];
+			this.staffAge=temp[11].equals("null")?null:Integer.valueOf(temp[5]);
+			this.staffGender=temp[6];
+			this.staffPosition=temp[7];
+			this.staffDepartment=temp[8];
+			this.staffTel=temp[9];
+			this.staffSalary = temp[11].equals("null")?null:Double.valueOf(temp[10]);
+			this.staffHireDate = (temp[11].equals("null")?null:Date.valueOf(temp[11]));
+			this.staffDimissionDate = (temp[12].equals("null")?null:Date.valueOf(temp[12]));
 		}
 		else {
 			throw new DatatypeConfigurationException("function getDatafromElement in " + this.getClass().getSimpleName() + "is not matched!");

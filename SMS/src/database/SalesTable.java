@@ -69,7 +69,7 @@ public class SalesTable extends TableOperate {
 		Statement st = null;
 		try {
 			st = conn.createStatement();
-			st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
+			if( 0!=st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
 					+ DataModel.idRN +" CHAR(20) NOT NULL,"
 					+ SalesData.goodsIDRN +" CHAR(20) NOT NULL,"
 					+ SalesData.priceOutRN +" DOUBLE NOT NULL,"
@@ -84,9 +84,14 @@ public class SalesTable extends TableOperate {
 					+ "REFERENCES StaffTable(" + DataModel.idRN  + "),"
 					+ "FOREIGN KEY(" + SalesData.clientIDRN +")"
 					+ "REFERENCES VIPTable(" + DataModel.idRN + ")"
-					+ ");");
-			System.out.println("SalesTable表建立完成！");
-			return true;
+					+ ");")) {
+						String[] index = new String[1];
+						index[0] = DataModel.idRN;
+						createIndexforTable(conn, "index_" + tableName, index);
+						return true;
+					}
+			//System.out.println("SalesTable表建立完成！");
+			//return true;
 		} 
 		catch(SQLException e){
 			e.printStackTrace();

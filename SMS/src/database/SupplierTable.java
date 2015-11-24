@@ -65,7 +65,7 @@ public class SupplierTable extends TableOperate {
 		Statement st = null;
 		try {
 			st = conn.createStatement();
-			st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
+			if( 0!=st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
 				+ DataModel.idRN +" CHAR(20) NOT NULL PRIMARY KEY,"
 				+ SupplierData.nameRN +" CHAR(50) NOT NULL,"
 				+ SupplierData.linkmanRN +" CHAR(50) NOT NULL,"
@@ -75,9 +75,14 @@ public class SupplierTable extends TableOperate {
 				+ SupplierData.bankRN + " CHAR(50),"
 				+ SupplierData.accountNameRN + " CHAR(50) NOT NULL,"
 				+ SupplierData.accountNumRN + " CHAR(50) NOT NULL,"
-				+ SupplierData.commentRN + " CHAR(200) DEFAULT NULL);");
-			System.out.println(tableName + "表建立完成！");
-			return true;
+				+ SupplierData.commentRN + " CHAR(200) DEFAULT NULL);")) {
+				String[] index = new String[1];
+				index[0] = DataModel.idRN;
+				createIndexforTable(conn, "index_" + tableName, index);
+				return true;
+			}
+			//System.out.println(tableName + "表建立完成！");
+			//return true;
 		} 
 		catch(SQLException e){
 			e.printStackTrace();

@@ -65,7 +65,7 @@ public class VIPTable extends TableOperate {
 		Statement st = null;
 		try {
 			st = conn.createStatement();
-			st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
+			if( 0!=st.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + "("
 					+ DataModel.idRN +" CHAR(20) NOT NULL PRIMARY KEY,"
 					+ VIPData.nameRN +" CHAR(50) NOT NULL,"
 					+ VIPData.iDNoRN +" CHAR(50) NOT NULL,"
@@ -76,9 +76,14 @@ public class VIPTable extends TableOperate {
 					+ VIPData.emailRN + " CHAR(50),"
 					+ VIPData.pointsRN + " INT DEFAULT 0,"
 					+ VIPData.totalPointsRN + " INT DEFAULT 0,"
-					+ VIPData.registDateRN + " DATE);");
-			System.out.println("VIPTable表建立完成！");
-			return true;
+					+ VIPData.registDateRN + " DATE);")) {
+				String[] index = new String[1];
+				index[0] = DataModel.idRN;
+				createIndexforTable(conn, "index_" + tableName, index);
+				return true;
+			}
+			//System.out.println("VIPTable表建立完成！");
+			//return true;
 		} 
 		catch(SQLException e){
 			System.out.println("VIPTable表建立失败！");
